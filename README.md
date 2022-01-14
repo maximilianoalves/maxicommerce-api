@@ -6,6 +6,6 @@ Routes
     - [x] Get Ping
 - Users
     - [x] Get Users
-    - [x] Post Users
-    - [x] Update Users
-    - [x] Delete Users
+    - [ ] Post Users
+    - [ ] Update Users
+    - [ ] Delete Users
