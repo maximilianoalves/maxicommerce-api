@@ -2,7 +2,10 @@
 
 Routes
 
-- Ping
-    - Get Ping
+- [x] Ping
+    - [x] Get Ping
 - Users
-    - Get Users
+    - [x] Get Users
+    - [x] Post Users
+    - [x] Update Users
+    - [x] Delete Users
