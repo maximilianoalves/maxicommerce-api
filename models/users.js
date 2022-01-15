@@ -15,24 +15,34 @@ exports.getIDs = function(query, callback){
 },
 
 exports.getAll = function(query, callback) {
-    users.find(query, function(err, users){
-        if(err){
-            callback(err);
-        } else {
-            callback(null, users);
-        }
-    })
+  users.find(query, function(err, users){
+    if(err){
+        callback(err);
+    } else {
+        callback(null, users);
+    }
+  })
 },
 
 exports.get = function(id, callback){
-    users.findOne({'userId': parseInt(id)}, function(err, users) {
-      if(err){
-        callback(err, null)
-      } else {
-        callback(null, users);
-      }
-    });
-  },
+  users.findOne({'userId': parseInt(id)}, function(err, users) {
+    if(err){
+      callback(err, null)
+    } else {
+      callback(null, users);
+    }
+  });
+},
+
+exports.findByUserName = function(userName, callback){
+  users.findOne({'userName': userName}, function(err, users) {
+    if(err){
+      callback(err, null)
+    } else {
+      callback(null, users);
+    }
+  });
+},
 
 exports.create = function(payload, callback){
     counter++;

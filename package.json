@@ -24,6 +24,8 @@
     "express": "^4.17.2",
     "express-xml-bodyparser": "^0.3.0",
     "js2xmlparser": "^4.0.2",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "validate": "^5.2.0",
+    "validate.js": "^0.13.1"
   }
 }

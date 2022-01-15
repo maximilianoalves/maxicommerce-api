@@ -18,10 +18,9 @@ var randomiseLastName = function(){
 };
 
 exports.createUser = function(){
-  var birth = new Date(1996, 1, 1);
+  let birth = new Date(1996, 1, 1);
 
-
-  var user = {
+  let user = {
     firstname: randomiseFirstName(),
     lastname: randomiseLastName(),
     password: 'Teste123',
