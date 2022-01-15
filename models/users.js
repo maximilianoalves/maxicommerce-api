@@ -24,7 +24,7 @@ exports.getAll = function(query, callback) {
   })
 },
 
-exports.get = function(id, callback){
+exports.getById = function(id, callback){
   users.findOne({'userId': parseInt(id)}, function(err, users) {
     if(err){
       callback(err, null)
@@ -35,7 +35,7 @@ exports.get = function(id, callback){
 },
 
 exports.findByUserName = function(userName, callback){
-  users.findOne({'userName': userName}, function(err, users) {
+  users.findOne({userName: userName}, function(err, users) {
     if(err){
       callback(err, null)
     } else {

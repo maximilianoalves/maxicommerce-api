@@ -4,7 +4,8 @@
   "description": "Projeto de api para utilizar no curso de Rest Assured + jUnit5",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env SEED=true node ./bin/www"
+    "start": "cross-env SEED=true node ./bin/www",
+    "docs": "./node_modules/.bin/apidoc -i routes -o public/apidoc"
   },
   "repository": {
     "type": "git",
@@ -15,8 +16,8 @@
   "bugs": {
     "url": "https://github.com/maximilianoalves/maxicommerce-api/issues"
   },
-  "homepage": "https://github.com/maximilianoalves/maxicommerce-api#readme",
   "devDependencies": {
+    "apidoc": "^0.50.3",
     "body-parser": "^1.19.1",
     "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",

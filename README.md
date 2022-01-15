@@ -5,7 +5,7 @@ Routes
 - [x] Ping
     - [x] Get Ping
 - Users
-    - [x] Get Users
-    - [ ] Post Users - Falta validar bodies iguais
+    - [x] Get Users - Show password only with basic auth
+    - [ ] Post Users
     - [ ] Update Users
     - [ ] Delete Users

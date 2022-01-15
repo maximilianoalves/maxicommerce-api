@@ -21,7 +21,6 @@ exports.allUsers = function(req, rawUser){
 
 exports.userWithId = function(req, rawUser){
   try {
-
     let user = {
       'firstname' : rawUser.firstname,
       'lastname' : rawUser.lastname,
@@ -35,16 +34,7 @@ exports.userWithId = function(req, rawUser){
       "user" : user
     }
   
-    switch(req.headers.accept){
-      case 'application/json':
-        return payload;
-        break;
-      case '*/*':
-        return payload;
-        break;
-      default:
-        return null;
-    }
+    return payload
   } catch(err) {
     return err.message;
   }

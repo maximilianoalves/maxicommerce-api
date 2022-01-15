@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 const xmlparser = require('express-xml-bodyparser');
 
 
-const routes = require('./routes/index');
+const routesPing = require('./routes/ping');
+const routesUsers = require('./routes/users');
 
 const app = express();
 
@@ -15,7 +16,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(xmlparser({trim: false, explicitArray: false}));
 
-app.use('/', routes);
+app.use('/ping', routesPing);
+app.use('/users', routesUsers);
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
