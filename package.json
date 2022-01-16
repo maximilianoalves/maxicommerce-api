@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env SEED=true node ./bin/www",
-    "docs": "./node_modules/.bin/apidoc -i routes -o public/apidoc"
+    "docs": "apidoc -i routes -o public/apidoc"
   },
   "repository": {
     "type": "git",

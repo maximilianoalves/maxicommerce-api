@@ -3,7 +3,7 @@
     "description": "Projeto de api para utilizar no curso de Rest Assured + jUnit5. <a href='/' style='font-size: 24px'>Click here to go back to Home</a>",
     "title": "Maxxicommerce Api",
     "version": "1.0.0",
-    "url" : "<define url>",
+    "url" : "http://localhost:3001/",
     "order": [
         "GetUsers",
         "GetUser",

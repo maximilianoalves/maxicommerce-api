@@ -22,6 +22,7 @@ exports.allUsers = function(req, rawUser){
 exports.userWithId = function(req, rawUser){
   try {
     let user = {
+      "id" : rawUser.id,
       'firstname' : rawUser.firstname,
       'lastname' : rawUser.lastname,
       'password' : rawUser.password,
@@ -29,12 +30,7 @@ exports.userWithId = function(req, rawUser){
       'birthDate': rawUser.birthDate
     }
   
-    let payload = {
-      "id" : rawUser.id,
-      "user" : user
-    }
-  
-    return payload
+    return user
   } catch(err) {
     return err.message;
   }

@@ -28,6 +28,5 @@ exports.serializeErrosValidateUser = function(msg) {
   if (msg.birthDate) {
     errors.push({birthDate: 'Campo birthDate é obrigatório!' });
   }
-
   return errors;
 }
