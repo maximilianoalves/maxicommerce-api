@@ -46,6 +46,7 @@ if(process.env.SEED === 'true'){
  * @apiSuccess {String} object.birthDate birthDate of a specific user.
  * @apiSuccess {String} count Quantity users have.
  * 
+ * @apiHeader {string} [Authorization=Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y]   Basic authoriaation header to access the PUT endpoint.
  * 
  * @apiSuccessExample {json} Response:
  * HTTP/1.1 200 OK
@@ -81,14 +82,25 @@ router.get('/', function(req, res, next) {
     if(typeof(req.query.lastname) != 'undefined'){
       query.lastname = req.query.lastname
     }
-    Users.getAll(query, function(err, record){
-      let users = parse.allUsers(req, record);
-      if(!users){
-        res.status(404).send(Errors.userNotFoundException());
-      } else {
-        res.send({'users': users, 'count': users.length});
-      }
-    })
+    if (req.headers.authorization == 'Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y') {
+      Users.getAll(query, function(err, record){
+        let users = parse.allUsers(req, record);
+        if(!users){
+          res.status(404).send(Errors.userNotFoundException());
+        } else {
+          res.send({'users': users, 'count': users.length});
+        }
+      })
+    } else {
+      Users.getAll(query, function(err, record){
+        let users = parse.allUsersWithoutPassword(req, record);
+        if(!users){
+          res.status(404).send(Errors.userNotFoundException());
+        } else {
+          res.send({'users': users, 'count': users.length});
+        }
+      })
+    }
 });
 
 /**
@@ -107,6 +119,8 @@ router.get('/', function(req, res, next) {
  * @apiSuccess {String} password Password of a specific user. This field only possible see when you have Basic auth.
  * @apiSuccess {String} userName userName of a specific user. Not permitted create same userNames.
  * @apiSuccess {String} birthDate birthDate of a specific user.
+ * 
+ * @apiHeader {string} [Authorization=Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y]   Basic authoriaation header to access the PUT endpoint.
  * 
  * @apiSuccessExample {json} Response:
  * HTTP/1.1 200 OK
@@ -128,6 +142,7 @@ router.get('/', function(req, res, next) {
 */
 // GET WITH ID
 router.get('/:id',function(req, res, next){
+  if (req.headers.authorization == 'Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y') {
     Users.getById(req.params.id, function(err, record){
       if(record){
         let user = parse.userWithId(req.headers.accept, record);
@@ -140,6 +155,20 @@ router.get('/:id',function(req, res, next){
         res.status(404).send(Errors.userNotFoundException());
       }
     })
+  } else {
+    Users.getById(req.params.id, function(err, record){
+      if(record){
+        let user = parse.userWithIdWithoutPassword(req.headers.accept, record);
+        if(!user){
+          res.status(418);
+        } else {
+          res.send(user);
+        }
+      } else {
+        res.status(404).send(Errors.userNotFoundException());
+      }
+    })
+  }
 });
 
 /**
