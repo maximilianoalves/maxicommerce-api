@@ -6,6 +6,10 @@ exports.bodyNotMakeRightException = function(errors) {
   }  
 }
 
+exports.notAuthorizedException = () => {
+  return {error: 'notAuthorizedException', message: 'Você não tem permissão para alterar um usuário'}
+}
+
 exports.userNotFoundException = function() {
   return {error: 'usersNotFoundException', message: 'Nenhum usuário encontrado'}
 }

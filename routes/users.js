@@ -222,7 +222,6 @@ router.post('/', function(req, res, next) {
               res.status(400);
             } else {
               let record = parse.userWithId(req, user);
-              record.id = payload.userWithId
               if(!record){
                 res.status(400).send(Errors.bodyNotMakeRightException());
               } else {
@@ -236,12 +235,122 @@ router.post('/', function(req, res, next) {
         }
       })
     } else {
-      res.status(400).send();
+      res.status(400).send(Errors.userNameAlreadyExistsException());
     }
   })
 });
 
-
-
+/**
+ * @api {put} users/:id Update User
+ * @apiName UpdateUser
+ * @apiGroup Users
+ * @apiVersion 1.0.0
+ * @apiDescription Updates a current user
+ * 
+ * @apiParam (Url Parameter) {Number} id                    ID for the user you want to update
+ * @apiSuccess {String} firstname Firstname of a specific user.
+ * @apiSuccess {String} lastname Lastname of a specific user.
+ * @apiSuccess {String} password Password of a specific user. This field only possible see when you have Basic auth.
+ * @apiSuccess {String} userName userName of a specific user. Not permitted create same userNames.
+ * @apiSuccess {String} birthDate birthDate of a specific user.
+ * 
+ * @apiHeader {string} [Authorization=Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y]   Basic authoriaation header to access the PUT endpoint.
+ * 
+ * @apiExample JSON example usage:
+ * curl --location --request PUT 'localhost:3001/users/2' \
+--header 'Authorization: Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "firstname": "Ana",
+    "lastname": "Silva",
+    "password": "Ronaldo",
+    "userName": "maxsilvaa",
+    "birthDate": "1991-12-14"
+}'
+ *
+ * @apiSuccess {String}  firstname             Firstname for the guest who made the booking
+ * @apiSuccess {String}  lastname              Lastname for the guest who made the booking
+ * @apiSuccess {Number}  totalprice            The total price for the booking
+ * @apiSuccess {Boolean} depositpaid           Whether the deposit has been paid or not
+ * @apiSuccess {Object}  bookingdates          Sub-object that contains the checkin and checkout dates
+ * @apiSuccess {Date}    bookingdates.checkin  Date the guest is checking in
+ * @apiSuccess {Date}    bookingdates.checkout Date the guest is checking out
+ * @apiSuccess {String}  additionalneeds       Any other needs the guest has
+ * 
+ * @apiSuccessExample {json} JSON Response:
+ * HTTP/1.1 200 OK
+ * {
+    "firstname": "Ana",
+    "lastname": "Silva",
+    "password": "Ronaldo",
+    "userName": "maxsilvaa",
+    "birthDate": "1991-12-14"
+}
+*
+* @apiError {String} error Exception of error occured
+* @apiError {String} message Message of error.
+* @apiError {object[]} object Array of objects that contain objects errors/validations of fields.
+* @apiError {String} object.firstname Error when don't have firstname in the request body.
+* @apiError {String} object.lastname Error when don't have lastname in the request body.
+* @apiError {String} object.password Error when don't have password in the request body.
+* @apiError {String} object.userName Error when don't have userName in the request body.
+* @apiError {String} object.birthDate Error when don't have birthDate in the request body.
+* 
+* @apiErrorExample
+* HTTP/1.1 400 BAD REQUEST
+*
+* {
+    "error": "bodyNotMakeRightException",
+    "message": "Corpo de envio incorreto"
+    "errors": [
+      {"firstname": "Campo firstname é obrigatório!" },
+      {"lastname": "Campo lastname é obrigatório!" },
+      {"password": "Campo password é obrigatório!" },
+      {"userName": "Campo userName é obrigatório!" },
+      {"birthDate": "Campo birthDate é obrigatório!" }
+    ]
+  }
+*
+* @apiErrorExample
+* HTTP/1.1 400 BAD REQUEST
+*
+{
+    "error": "userNameAlReadyExistsException",
+    "message": "userName em uso"
+}
+ * */
+// PUT
+router.put('/:id', function(req, res, next){
+  if (req.headers.authorization == 'Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y') {
+    updateUser = req.body;
+    Users.findByUserName(updateUser.userName, (err, record) => {
+      if(!record) {
+        validator.validateUser(updateUser, (payload, msg) => {
+          if(!msg) {
+            Users.update(req.params.id, updateUser, (err) => {
+              Users.getById(req.params.id, (err, record) => {
+                if(record) {
+                  let user = parse.userWithId(req.headers.accept, record);
+                  if(!user){
+                    res.sendStatus(418);
+                  } else {
+                    res.send(user);
+                  }
+                }
+              });
+            });
+          } else {
+            let errors = validator.serializeErrosValidateUser(msg)
+            res.status(400).send(Errors.bodyNotMakeRightException(errors));
+          }
+        })
+      } else {
+        res.status(400).send(Errors.userNameAlreadyExistsException());
+      }
+    })
+  } else {
+    res.status(401).send(Errors.notAuthorizedException())
+  }
+});
 
 module.exports = router;
