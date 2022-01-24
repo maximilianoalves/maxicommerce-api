@@ -19,12 +19,14 @@ var randomiseLastName = function(){
 
 exports.createUser = function(){
   let birth = new Date(1996, 1, 1);
+  let randomBool = Math.random() < 0.5
 
   let user = {
     firstname: randomiseFirstName(),
     lastname: randomiseLastName(),
     password: 'Teste123',
     userName: randomiseFirstName().toLocaleLowerCase()+randomiseLastName(),
+    admin: randomBool,
     birthDate: dateFormat(birth.setHours(15,0,0,0), "yyyy-mm-dd"),
   }
 

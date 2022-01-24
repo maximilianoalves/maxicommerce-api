@@ -6,8 +6,9 @@ exports.allUsers = (req, rawUser) => {
       firstname: u.firstname,
       lastname: u.lastname,
       password: u.password,
+      admin: u.admin,
       userName: u.userName,
-      birthDate: u.birthDate,
+      birthDate: u.birthDate
     }
     payload.push(tmpUser);
   });
@@ -21,6 +22,7 @@ exports.allUsersWithoutPassword = (req, rawUser) => {
       id: user.userId,
       firstname: user.firstname,
       lastname: user.lastname,
+      admin: user.admin,
       userName: user.userName,
       birthDate: user.birthDate,
     }

@@ -1,8 +1,10 @@
-var Datastore = require('nedb');
-var db = new Datastore();
-var counter = 0;
+let Datastore = require('nedb');
+let bcrypt = require('bcrypt');
+let db = new Datastore();
+let counter = 0;
 
-var users = new Datastore();
+
+let users = new Datastore();
 
 exports.getIDs = function(query, callback){
     users.find(query, function(err, ids){
@@ -44,16 +46,26 @@ exports.findByUserName = function(userName, callback){
   });
 },
 
+exports.findByUserNameAndPass = function(userName,pass, callback){
+  users.findOne({userName: userName, password: pass}, function(err, users) {
+    if(err){
+      callback(err, null)
+    } else {
+      callback(null, users);
+    }
+  });
+},
+
 exports.create = function(payload, callback){
     counter++;
     payload.userId = counter;
     users.insert(payload, function(err, doc) {
-        if(err){
-            callback(err);
-        } else {
-            callback(null, payload);
-        }
-    });
+      if(err){
+          callback(err);
+      } else {
+          callback(null, payload);
+      }
+  });
 },
 
 exports.update = function(id, updatedUser, callback){
@@ -78,7 +90,6 @@ exports.delete = function(id, callback){
   
 exports.deleteAll = function(callback){
     counter = 0;
-    
     users.remove({}, function(err){
         callback();
     });

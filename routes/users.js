@@ -1,4 +1,8 @@
 const express = require('express');
+let authenticator = require('../helpers/authenticator');
+let dateFormat = require("dateFormat");
+
+
 const router  = express.Router();
 const createDefaultUser = require('../helpers/createDefaultUsers');
 const Users = require('../models/users');
@@ -8,9 +12,30 @@ const Errors = require('../models/errors');
 
 // add default users
 if(process.env.SEED === 'true'){
-    var count = 1;
+    let count = 1;
     ( function createUser(){
-      var newUser = createDefaultUser.createUser()
+      let newUser = {};
+      if (count == 1) {
+        newUser = {
+          firstname: "Usuário",
+          lastname: "Administrador",
+          password: 'admin',
+          userName: "admin",
+          admin: true,
+          birthDate: dateFormat(new Date(1991, 12, 14).setHours(15,0,0,0), "yyyy-mm-dd"),
+        }
+      } else if(count == 2) {
+        newUser = {
+          firstname: "Normal",
+          lastname: "user",
+          password: 'Teste123',
+          userName: "normalUser",
+          admin: false,
+          birthDate: dateFormat(new Date(1991, 12, 14).setHours(15,0,0,0), "yyyy-mm-dd"),
+        }
+      } else {
+        newUser = createDefaultUser.createUser()
+      }
       Users.create(newUser, function(err, result){
           if(err) return console.error(err);
           if(count < 5){
@@ -31,22 +56,28 @@ if(process.env.SEED === 'true'){
  * @apiParam {String} [firstname] Return users with a specific firstname
  * @apiParam {String} [lastname]  Return users with a specific lastname
  * 
- * @apiExample Example 1 (All Users):
- * curl --location --request GET 'localhost:3001/users'
+ *  @apiExample Example 1 (All Users - Normal User ):
+ * curl -L -X GET 'localhost:3001/users' \ 
+ * -H 'Authorization: Basic bm9ybWFsVXNlcjpUZXN0ZTEyMw=='
+ * 
+ * @apiExample Example 1 (All Users - Admin ):
+ * curl -L -X GET 'localhost:3001/users' \ 
+ * -H 'Authorization: Basic YWRtaW46YWRtaW4='
  * 
  * @apiExample Example 2 (Filter by name):
- * curl --location --request GET 'localhost:3001/users?firstname=Monica&lastname=Alves
+ * curl -L -X GET 'localhost:3001/users?firstname=Monica&lastname=Alves' \
+ * -H 'Authorization: Basic bm9ybWFsVXNlcjpUZXN0ZTEyMw=='
  * 
  * @apiSuccess {object[]} object Array of objects that contain Users objects
  * @apiSuccess {number} object.id ID of a specific user that matches search criteria
  * @apiSuccess {String} object.firstname Firstname of a specific user.
  * @apiSuccess {String} object.lastname Lastname of a specific user.
- * @apiSuccess {String} object.password Password of a specific user. This field only possible see when you have Basic auth.
+ * @apiSuccess {String} object.password Password of a specific user. This field only possible see when you have Basic admin auth.
  * @apiSuccess {String} object.userName userName of a specific user. Not permitted create same userNames.
  * @apiSuccess {String} object.birthDate birthDate of a specific user.
  * @apiSuccess {String} count Quantity users have.
  * 
- * @apiHeader {string} [Authorization=Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y]   Basic authoriaation header to access the PUT endpoint.
+ * @apiHeader {string} [Authorization]   Basic authoriaation header to access the PUT endpoint. You add username and password to create the basic token
  * 
  * @apiSuccessExample {json} Response:
  * HTTP/1.1 200 OK
@@ -82,25 +113,31 @@ router.get('/', function(req, res, next) {
     if(typeof(req.query.lastname) != 'undefined'){
       query.lastname = req.query.lastname
     }
-    if (req.headers.authorization == 'Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y') {
-      Users.getAll(query, function(err, record){
-        let users = parse.allUsers(req, record);
-        if(!users){
-          res.status(404).send(Errors.userNotFoundException());
-        } else {
-          res.send({'users': users, 'count': users.length});
-        }
-      })
-    } else {
-      Users.getAll(query, function(err, record){
-        let users = parse.allUsersWithoutPassword(req, record);
-        if(!users){
-          res.status(404).send(Errors.userNotFoundException());
-        } else {
-          res.send({'users': users, 'count': users.length});
-        }
-      })
-    }
+    
+    authenticator.auth(req, res, next, (userStatus) => {
+      // is admin
+      if (userStatus == 0) {
+        Users.getAll(query, function(err, record){
+          let users = parse.allUsers(req, record);
+          if(!users){
+            res.status(404).send(Errors.userNotFoundException());
+          } else {
+            res.status(200).send({'users': users, 'count': users.length});
+          }
+        })
+      } else if (userStatus == 1 ) {
+        Users.getAll(query, function(err, record){
+          let users = parse.allUsersWithoutPassword(req, record);
+          if(!users){
+            res.status(404).send(Errors.userNotFoundException());
+          } else {
+            res.status(200).send({'users': users, 'count': users.length});
+          }
+        })
+      } else {
+        res.status(401).send(Errors.userIsNotAdmin())
+      }
+    });
 });
 
 /**
@@ -110,8 +147,13 @@ router.get('/', function(req, res, next) {
  * @apiVersion 1.0.0
  * @apiDescription Returns specific user that exist within the API.
  * 
- * @apiExample Example 1 (Get User by ID):
- * curl --location --request GET 'localhost:3001/users/1'
+ *  @apiExample Example 1 (All Users - Normal User ):
+ * curl -L -X GET 'localhost:3001/users/1' \ 
+ * -H 'Authorization: Basic bm9ybWFsVXNlcjpUZXN0ZTEyMw=='
+ * 
+ * @apiExample Example 1 (All Users - Admin ):
+ * curl -L -X GET 'localhost:3001/users/1' \ 
+ * -H 'Authorization: Basic YWRtaW46YWRtaW4='
  * 
  * @apiSuccess {number} id ID of a specific user that matches search criteria
  * @apiSuccess {String} firstname Firstname of a specific user.
@@ -120,7 +162,7 @@ router.get('/', function(req, res, next) {
  * @apiSuccess {String} userName userName of a specific user. Not permitted create same userNames.
  * @apiSuccess {String} birthDate birthDate of a specific user.
  * 
- * @apiHeader {string} [Authorization=Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y]   Basic authoriaation header to access the PUT endpoint.
+ * @apiHeader {string} [Authorization]   Basic authoriaation header to access the PUT endpoint. You add username and password to create the basic token
  * 
  * @apiSuccessExample {json} Response:
  * HTTP/1.1 200 OK
@@ -140,35 +182,40 @@ router.get('/', function(req, res, next) {
     "message": "Nenhum usuário encontrado"
 }
 */
-// GET WITH ID
+// GET BY ID
 router.get('/:id',function(req, res, next){
-  if (req.headers.authorization == 'Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y') {
-    Users.getById(req.params.id, function(err, record){
-      if(record){
-        let user = parse.userWithId(req.headers.accept, record);
-        if(!user){
-          res.status(418);
+  authenticator.auth(req, res, next, (userStatus) => {
+    // is admin
+    if (userStatus == 0) {
+      Users.getById(req.params.id, function(err, record){
+        if(record){
+          let user = parse.userWithId(req.headers.accept, record);
+          if(!user){
+            res.status(418);
+          } else {
+            res.send(user);
+          }
         } else {
-          res.send(user);
+          res.status(404).send(Errors.userNotFoundException());
         }
-      } else {
-        res.status(404).send(Errors.userNotFoundException());
-      }
-    })
-  } else {
-    Users.getById(req.params.id, function(err, record){
-      if(record){
-        let user = parse.userWithIdWithoutPassword(req.headers.accept, record);
-        if(!user){
-          res.status(418);
+      });
+    } else if (userStatus == 1 ) {
+      Users.getById(req.params.id, function(err, record){
+        if(record){
+          let user = parse.userWithIdWithoutPassword(req.headers.accept, record);
+          if(!user){
+            res.status(418);
+          } else {
+            res.send(user);
+          }
         } else {
-          res.send(user);
+          res.status(404).send(Errors.userNotFoundException());
         }
-      } else {
-        res.status(404).send(Errors.userNotFoundException());
-      }
-    })
-  }
+      })
+    } else {
+      res.status(401).send(Errors.userIsNotAdmin())
+    }
+  })
 });
 
 /**
@@ -296,15 +343,6 @@ router.post('/', function(req, res, next) {
     "userName": "maxsilvaa",
     "birthDate": "1991-12-14"
 }'
- *
- * @apiSuccess {String}  firstname             Firstname for the guest who made the booking
- * @apiSuccess {String}  lastname              Lastname for the guest who made the booking
- * @apiSuccess {Number}  totalprice            The total price for the booking
- * @apiSuccess {Boolean} depositpaid           Whether the deposit has been paid or not
- * @apiSuccess {Object}  bookingdates          Sub-object that contains the checkin and checkout dates
- * @apiSuccess {Date}    bookingdates.checkin  Date the guest is checking in
- * @apiSuccess {Date}    bookingdates.checkout Date the guest is checking out
- * @apiSuccess {String}  additionalneeds       Any other needs the guest has
  * 
  * @apiSuccessExample {json} JSON Response:
  * HTTP/1.1 200 OK

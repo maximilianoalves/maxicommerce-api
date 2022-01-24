@@ -17,3 +17,11 @@ exports.userNotFoundException = function() {
 exports.userNameAlreadyExistsException = function() {
   return {error: 'userNameAlReadyExistsException', message: 'userName em uso'};
 }
+
+exports.userWithoutAuthorization = function() {
+  return {error: 'userWithoutAuthorizationException', message: 'Usuário não autenticado'};
+}
+
+exports.userIsNotAdmin = function() {
+  return {error: 'userIsNotAdminException', message: 'Você precisa de um usuários administrador'};
+}
