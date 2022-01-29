@@ -4,6 +4,7 @@ exports.returnUserRuleSet = function(){
     lastname : {presence: true},
     password : {presence: true},
     userName: {presence: true},
+    admin: {presence: true},
     birthDate: {presence: true}
   };
 

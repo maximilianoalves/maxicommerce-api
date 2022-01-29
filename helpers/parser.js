@@ -39,6 +39,7 @@ exports.userWithId = (req, rawUser) => {
       'lastname' : rawUser.lastname,
       'password' : rawUser.password,
       'userName': rawUser.userName,
+      'admin': rawUser.admin,
       'birthDate': rawUser.birthDate
     }
     return user

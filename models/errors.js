@@ -23,5 +23,5 @@ exports.userWithoutAuthorization = function() {
 }
 
 exports.userIsNotAdmin = function() {
-  return {error: 'userIsNotAdminException', message: 'Você precisa de um usuários administrador'};
+  return {error: 'userIsNotAdminException', message: 'Você precisa de um usuários administrador.'};
 }

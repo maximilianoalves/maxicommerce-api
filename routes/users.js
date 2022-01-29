@@ -125,7 +125,7 @@ router.get('/', function(req, res, next) {
             res.status(200).send({'users': users, 'count': users.length});
           }
         })
-      } else if (userStatus == 1 ) {
+      } else {
         Users.getAll(query, function(err, record){
           let users = parse.allUsersWithoutPassword(req, record);
           if(!users){
@@ -134,8 +134,6 @@ router.get('/', function(req, res, next) {
             res.status(200).send({'users': users, 'count': users.length});
           }
         })
-      } else {
-        res.status(401).send(Errors.userIsNotAdmin())
       }
     });
 });
@@ -162,7 +160,7 @@ router.get('/', function(req, res, next) {
  * @apiSuccess {String} userName userName of a specific user. Not permitted create same userNames.
  * @apiSuccess {String} birthDate birthDate of a specific user.
  * 
- * @apiHeader {string} [Authorization]   Basic authoriaation header to access the PUT endpoint. You add username and password to create the basic token
+ * @apiHeader {string} [Authorization]   Basic authorization header to access the PUT endpoint. You add username and password to create the basic token
  * 
  * @apiSuccessExample {json} Response:
  * HTTP/1.1 200 OK
@@ -199,7 +197,7 @@ router.get('/:id',function(req, res, next){
           res.status(404).send(Errors.userNotFoundException());
         }
       });
-    } else if (userStatus == 1 ) {
+    } else {
       Users.getById(req.params.id, function(err, record){
         if(record){
           let user = parse.userWithIdWithoutPassword(req.headers.accept, record);
@@ -212,8 +210,6 @@ router.get('/:id',function(req, res, next){
           res.status(404).send(Errors.userNotFoundException());
         }
       })
-    } else {
-      res.status(401).send(Errors.userIsNotAdmin())
     }
   })
 });
@@ -289,31 +285,38 @@ router.get('/:id',function(req, res, next){
 // POST
 router.post('/', function(req, res, next) {
   newUser = req.body;
-  Users.findByUserName(newUser.userName, function(err, record) {
-    if(!record) {
-      validator.validateUser(newUser, function (payload, msg){
-        if(!msg) {
-          Users.create(newUser, function(err, user) {
-            if(err) {
-              res.status(400);
+  authenticator.authForNewUser(req, res, next, (userStatus) => {
+    // is admin
+    if (userStatus == 0) {
+      Users.findByUserName(newUser.userName, function(err, record) {
+        if(!record) {
+          validator.validateUser(newUser, function (payload, msg){
+            if(!msg) {
+              Users.create(newUser, function(err, user) {
+                if(err) {
+                  res.status(400);
+                } else {
+                  let record = parse.userWithId(req, user);
+                  if(!record){
+                    res.status(400).send(Errors.bodyNotMakeRightException());
+                  } else {
+                    res.send(record);
+                  }
+                }
+              })
             } else {
-              let record = parse.userWithId(req, user);
-              if(!record){
-                res.status(400).send(Errors.bodyNotMakeRightException());
-              } else {
-                res.send(record);
-              }
+              let errors = validator.serializeErrosValidateUser(msg)
+              res.status(400).send(Errors.bodyNotMakeRightException(errors));
             }
           })
         } else {
-          let errors = validator.serializeErrosValidateUser(msg)
-          res.status(400).send(Errors.bodyNotMakeRightException(errors));
+          res.status(400).send(Errors.userNameAlreadyExistsException());
         }
-      })
+      });
     } else {
-      res.status(400).send(Errors.userNameAlreadyExistsException());
+      res.status(401).send(Errors.userIsNotAdmin())
     }
-  })
+  });
 });
 
 /**
@@ -388,36 +391,80 @@ router.post('/', function(req, res, next) {
  * */
 // PUT
 router.put('/:id', function(req, res, next){
-  if (req.headers.authorization == 'Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y') {
-    updateUser = req.body;
-    Users.findByUserName(updateUser.userName, (err, record) => {
-      if(!record) {
-        validator.validateUser(updateUser, (payload, msg) => {
-          if(!msg) {
-            Users.update(req.params.id, updateUser, (err) => {
-              Users.getById(req.params.id, (err, record) => {
-                if(record) {
-                  let user = parse.userWithId(req.headers.accept, record);
-                  if(!user){
-                    res.sendStatus(418);
-                  } else {
-                    res.send(user);
+  authenticator.authForNewUser(req, res, next, (userStatus) => {
+    // is admin
+    if (userStatus == 0) {
+      updateUser = req.body;
+      Users.findByUserName(updateUser.userName, (err, record) => {
+        if(!record) {
+          validator.validateUser(updateUser, (payload, msg) => {
+            if(!msg) {
+              Users.update(req.params.id, updateUser, (err) => {
+                Users.getById(req.params.id, (err, record) => {
+                  if(record) {
+                    let user = parse.userWithId(req.headers.accept, record);
+                    if(!user){
+                      res.sendStatus(418);
+                    } else {
+                      res.send(user);
+                    }
                   }
-                }
+                });
               });
-            });
-          } else {
-            let errors = validator.serializeErrosValidateUser(msg)
-            res.status(400).send(Errors.bodyNotMakeRightException(errors));
-          }
-        })
+            } else {
+              let errors = validator.serializeErrosValidateUser(msg)
+              res.status(400).send(Errors.bodyNotMakeRightException(errors));
+            }
+          })
+        } else {
+          res.status(400).send(Errors.userNameAlreadyExistsException());
+        }
+      })
       } else {
-        res.status(400).send(Errors.userNameAlreadyExistsException());
+        res.status(401).send(Errors.userIsNotAdmin())
       }
-    })
-  } else {
-    res.status(401).send(Errors.notAuthorizedException())
-  }
+  });
+});
+
+/**
+ * @api {delete} users/:id Delete User
+ * @apiName DeleteUser
+ * @apiGroup Users
+ * @apiVersion 1.0.0
+ * @apiDescription Delete a current user
+ * 
+ * @apiParam (Url Parameter) {Number} id                    ID for the user you want to delete
+ * 
+ * @apiHeader {string} [Authorization=Basic YWRtaW5pc3RyYXRvcjphZG1pbmlzdHJhdG9y]   Basic authorization header to access the PUT endpoint.
+ * 
+ * @apiExample JSON example usage:
+ * curl -L -X DELETE 'localhost:3001/users/52' 
+ * \-H 'Authorization: Basic YWRtaW46YWRtaW4='
+ * 
+ * @apiSuccessExample {json} JSON Response:
+ * HTTP/1.1 200 OK
+ * {
+    "message": "Usuario 2 excluído com sucesso"
+}
+*
+* 
+*/
+// DELETE
+router.delete('/:id', function(req, res, next){
+  authenticator.authForNewUser(req, res, next, (userStatus) => {
+    // is admin
+    if (userStatus == 0) {
+      Users.delete(req.params.id, (err) => {
+        if (!err) {
+          res.status(200).send({message: `Usuario ${req.params.id} excluído com sucesso`})
+        } else {
+          res.status(404).send(Errors.userNotFoundException())
+        }
+      })
+    } else {
+      res.status(401).send(Errors.userIsNotAdmin())
+    }
+  });
 });
 
 module.exports = router;

@@ -79,7 +79,7 @@ exports.update = function(id, updatedUser, callback){
 },
   
 exports.delete = function(id, callback){
-    users.remove({'userId': parseInt(id)}, function(err){
+    users.remove({'userId': parseInt(id)}, function(err, record){
         if(err){
             callback(err);
         } else {
