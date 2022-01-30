@@ -14,6 +14,10 @@ exports.userNotFoundException = function() {
   return {error: 'usersNotFoundException', message: 'Nenhum usuário encontrado'}
 }
 
+exports.productsNotFoundException = function() {
+  return {error: 'productsNotFoundException', message: 'Nenhum produto encontrado'}
+}
+
 exports.userNameAlreadyExistsException = function() {
   return {error: 'userNameAlReadyExistsException', message: 'userName em uso'};
 }

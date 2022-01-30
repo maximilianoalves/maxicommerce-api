@@ -1,5 +1,4 @@
 let Datastore = require('nedb');
-let bcrypt = require('bcrypt');
 let db = new Datastore();
 let counter = 0;
 

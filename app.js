@@ -5,8 +5,9 @@ const bodyParser = require('body-parser');
 const xmlparser = require('express-xml-bodyparser');
 
 
-const routesPing = require('./routes/ping');
-const routesUsers = require('./routes/users');
+let routesPing = require('./routes/ping');
+let routesUsers = require('./routes/users');
+let routesProducts = require('./routes/products');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(xmlparser({trim: false, explicitArray: false}));
 
 app.use('/ping', routesPing);
 app.use('/users', routesUsers);
+app.use('/products', routesProducts);
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');

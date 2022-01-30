@@ -1,12 +1,11 @@
-const express = require('express');
+let express = require('express');
 let authenticator = require('../helpers/authenticator');
 let dateFormat = require("dateFormat");
 
-
-const router  = express.Router();
+let router  = express.Router();
 const createDefaultUser = require('../helpers/createDefaultUsers');
 const Users = require('../models/users');
-const parse = require('../helpers/parser');
+const parse = require('../helpers/userParser');
 const validator = require('../helpers/validator');
 const Errors = require('../models/errors');
 
