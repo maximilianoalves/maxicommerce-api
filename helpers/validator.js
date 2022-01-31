@@ -11,6 +11,10 @@ exports.validateUser = function(payload, callback){
   callback(payload, validate(payload, rules.returnUserRuleSet()))
 }
 
+exports.validateProduct = function(payload, callback){
+  callback(payload, validate(payload, rules.returnProductRuleSet()))
+}
+
 exports.serializeErrosValidateUser = function(msg) {
   let errors = [];
   if (msg.firstname) {
@@ -27,6 +31,20 @@ exports.serializeErrosValidateUser = function(msg) {
   }
   if (msg.birthDate) {
     errors.push({birthDate: 'Campo birthDate é obrigatório!' });
+  }
+  return errors;
+}
+
+exports.serializeErrosValidateProduct = function(msg) {
+  let errors = [];
+  if (msg.name) {
+    errors.push({name: 'Campo name é obrigatório!' });
+  }
+  if (msg.price) {
+    errors.push({price: 'Campo price é obrigatório!' });
+  }
+  if (msg.quantity) {
+    errors.push({quantity: 'Campo quantity é obrigatório!' });
   }
   return errors;
 }

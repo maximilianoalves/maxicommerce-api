@@ -22,6 +22,10 @@ exports.userNameAlreadyExistsException = function() {
   return {error: 'userNameAlReadyExistsException', message: 'userName em uso'};
 }
 
+exports.productNameAlreadyExistsException = function() {
+  return {error: 'productNameAlreadyExistsException', message: 'Nome do produto já está em uso'};
+}
+
 exports.userWithoutAuthorization = function() {
   return {error: 'userWithoutAuthorizationException', message: 'Usuário não autenticado'};
 }

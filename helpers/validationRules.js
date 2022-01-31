@@ -10,3 +10,13 @@ exports.returnUserRuleSet = function(){
 
   return constraints
 }
+
+exports.returnProductRuleSet = function(){
+  var productConstraints = {
+    name : {presence: true},
+    price : {presence: true},
+    quantity : {presence: true}
+  };
+
+  return productConstraints
+}
