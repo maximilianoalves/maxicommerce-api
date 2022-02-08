@@ -446,7 +446,6 @@ router.put('/:id', function(req, res, next){
     "message": "Usuario 2 excluído com sucesso"
 }
 *
-* 
 */
 // DELETE
 router.delete('/:id', function(req, res, next){

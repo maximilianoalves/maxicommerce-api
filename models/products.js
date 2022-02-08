@@ -2,9 +2,7 @@ let Datastore = require('nedb');
 let db = new Datastore();
 let counter = 0;
 
-
 let products = new Datastore();
-
 
 exports.getAll = (query, callback) => {
     if (Object.keys(query).length > 0) {
@@ -31,13 +29,10 @@ exports.getAll = (query, callback) => {
                 callback(null, products);
             }
         })
-    }
-
-    
+    }  
 },
-
-exports.getById = function(id, callback){
-    products.findOne({'productId': parseInt(id)}, function(err, products) {
+exports.getById = (id, callback) => {
+    products.findOne({'productId': parseInt(id)}, (err, products) => {
       if(err){
         callback(err, null)
       } else {
@@ -45,7 +40,6 @@ exports.getById = function(id, callback){
       }
     });
 },
-
 exports.findByName = (name, callback) => {
     products.findOne({name: name}, (err, products) => {
       if(err){
@@ -55,18 +49,37 @@ exports.findByName = (name, callback) => {
       }
     });
 },
-
-exports.create = function(payload, callback){
+exports.create = (payload, callback) => {
     counter++;
     payload.productId = counter;
-
     payload.formmatedPrice = `R$ ${payload.price}`
 
-    products.insert(payload, function(err, doc) {
+    products.insert(payload, (err, doc) => {
       if(err){
           callback(err);
       } else {
           callback(null, payload);
       }
   });
+},
+exports.update = (id, updateProduct, callback) => {
+
+    updateProduct.formmatedPrice = `R$ ${updateProduct.price}`
+
+    products.update({'productId': parseInt(id)}, { $set: updateProduct }, {}, (err) => {
+        if(err){
+            callback(err);
+        } else {
+            callback(null);
+        }
+    });
+},
+exports.delete = (id, callback) => {
+    products.remove({'productId': parseInt(id)}, (err, record) => {
+        if(err){
+            callback(err);
+        } else {
+            callback(null);
+        }
+    });
 }
