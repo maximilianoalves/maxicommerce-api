@@ -257,49 +257,49 @@ router.post('/', (req, res, next) => {
  * -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
  * -H 'Content-Type: application/json' \
  * --data-raw '{
-    "name": "Bola nike",
-    "price": 11.20,
-    "quantity": 12
-}'
+ *  "name": "Bola nike",
+ *  "price": 11.20,
+ *  "quantity": 12
+ *}'
  * 
  * @apiSuccessExample {json} JSON Response:
  * HTTP/1.1 200 OK
  * {
-    "id": 2,
-    "name": "Bola nike",
-    "price": 11.2,
-    "formmatedPrice": "R$ 11.2",
-    "quantity": 12
-}
-*
-* @apiError {String} error Exception of error occured
-* @apiError {String} message Message of error.
-* @apiError {object[]} object Array of objects that contain objects errors/validations of fields.
-* @apiError {String} object.name Error when don't have name in the request body.
-* @apiError {String} object.price Error when don't have price in the request body.
-* @apiError {String} object.quantity Error when don't have quantity in the request body. 
-* @apiErrorExample
-*
-* HTTP/1.1 400 BAD REQUEST
-*
-* {
-    "error": "bodyNotMakeRightException",
-    "message": "Corpo de envio incorreto"
-    errors: [
-      {name: 'Campo name é obrigatório!' },
-      {price: 'Campo price é obrigatório!' },
-      {quantity: 'Campo quantity é obrigatório!' }
-    ]
-  }
-*
-* @apiErrorExample
-* HTTP/1.1 400 BAD REQUEST
-*
-{
-    "error": "productNameAlReadyExistsException",
-    "message": "Nome do produto já está em uso"
-}
- * */
+ *  "id": 2,
+ *  "name": "Bola nike",
+ *  "price": 11.2,
+ *  "formmatedPrice": "R$ 11.2",
+ *  "quantity": 12
+ *}
+ *
+ * @apiError {String} error Exception of error occured
+ * @apiError {String} message Message of error.
+ * @apiError {object[]} object Array of objects that contain objects errors/validations of fields.
+ * @apiError {String} object.name Error when don't have name in the request body.
+ * @apiError {String} object.price Error when don't have price in the request body.
+ * @apiError {String} object.quantity Error when don't have quantity in the request body. 
+ * @apiErrorExample
+ *
+ * HTTP/1.1 400 BAD REQUEST
+ *
+ * {
+ *  "error": "bodyNotMakeRightException",
+ *  "message": "Corpo de envio incorreto"
+ *  errors: [
+ *    {name: 'Campo name é obrigatório!' },
+ *    {price: 'Campo price é obrigatório!' },
+ *    {quantity: 'Campo quantity é obrigatório!' }
+ *  ]
+ *}
+ *
+ * @apiErrorExample
+ * HTTP/1.1 400 BAD REQUEST
+ *
+ *{
+ *  "error": "productNameAlReadyExistsException",
+ *  "message": "Nome do produto já está em uso"
+ *}
+*/
 // PUT
 router.put('/:id', (req, res, next) => {
   authenticator.authForNewUser(req, res, next, (userStatus) => {
