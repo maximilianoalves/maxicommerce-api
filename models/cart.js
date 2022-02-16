@@ -1,7 +1,8 @@
 let Datastore = require('nedb');
 let db = new Datastore();
 
-let products = require('../models/products')
+let Products = require('../models/products')
+let Users = require('../models/users')
 
 let carts = new Datastore();
 
@@ -18,10 +19,46 @@ exports.get = (callback) => {
 exports.addProductToCart = (payload, username, callback) => {
     products.getById(payload.id, (err, record) => {
         if(err) {
-            // TODO: Lançar exception informando que o produto não está cadastrado na bas.
+            callback(err)
         } else {
-            // TODO: Fazer a busca por usuário.
-            // TODO: Se houver uma sacola para o usuário adicionar o produto dentro do array de produtos.
+            carts.findByUserName(username, (err, recordCart) => {
+                if (recordUser) {
+                    products = recordCart.products;
+                    let hasProduct = false;
+                    let total = recordCart.total;
+                    products.forEach((product) => {
+                        if (product.productId == payload.id) {
+                            product.quantity = payload.quantity;
+                            total = total + (product.price * product.quantity)
+                            hasProduct = true;
+                        }
+                    })
+
+                    if (!hasProduct) {
+                        products.push({
+                            "id": record.productId,
+                            "name": record.name,
+                            "price": record.price,
+                            "formmatedPrice": record.formmatedPrice,
+                            "quantity": payload.quantity
+                        });
+                        total = total + (record.price * payload.quantity)
+                    }
+
+                    recordCart.total = total
+                } else {
+                    // TODO: Criar uma sacola e adicionar o produto.
+                }
+            })
         }
     })
+},
+exports.findByUserName = (name, callback) => {
+    carts.findOne({username: name}, (err, carts) => {
+      if(err){
+        callback(err, null)
+      } else {
+        callback(null, carts);
+      }
+    });
 }

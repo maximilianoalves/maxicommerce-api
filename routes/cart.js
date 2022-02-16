@@ -40,12 +40,14 @@ const Errors = require('../models/errors');
  *          "name": "TV 50' LG",
  *          "price": "12.02",
  *          "formmatedPrice": "R$ 12.02",
+ *          "quantity": 3
  *      },
  *      {
  *          "id": 2,
  *          "name": "Nike Jordan Retro 1",
  *          "price": "18.85",
  *          "formmatedPrice": "R$ 18.85",
+ *          "quantity": 3
  *      }
  *  ]
  *}
