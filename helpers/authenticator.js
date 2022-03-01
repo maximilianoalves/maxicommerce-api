@@ -27,6 +27,28 @@ exports.auth = (req, res, next, callback) => {
     }
 }
 
+exports.authCart = (req, res, next, callback) => {
+    let authHeader = req.headers.authorization
+
+    if(authHeader != null && typeof authHeader != 'undefined') {
+        let auth = new Buffer.from(authHeader.split(' ')[1],'base64').toString().split(':');
+        let user = auth[0];
+        let pass = auth[1];
+    
+        Users.findByUserNameAndPass(user, pass, (err, record) => {
+            // 0 - user exist
+            // 1 - user not exist
+            if(record) {
+                callback({userType: 0, userName: user});
+            } else {
+                callback({userType: 1, userName: user});
+            }
+        })
+    } else {
+        callback({userType: 1, userName: null});
+    }
+}
+
 exports.authForNewUser = (req, res, next, callback) => {
     let authHeader = req.headers.authorization
 

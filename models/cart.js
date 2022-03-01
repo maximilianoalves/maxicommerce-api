@@ -17,44 +17,77 @@ exports.get = (callback) => {
     })  
 },
 exports.addProductToCart = (payload, username, callback) => {
-    products.getById(payload.id, (err, record) => {
-        if(err) {
-            callback(err)
+  Products.getById(payload.id, (err, record) => {
+    let productRecord = record
+
+    if(err) {
+        callback(err)
+    } else {
+      this.findByUserName(username, (err, recordCart) => {
+        if (recordCart) {
+          let cart = recordCart
+          let products = cart.products;
+          let hasProduct = false;
+          let total = cart.total;
+          products.forEach((product) => {
+            if (product.id == payload.id) {
+              product.quantity = payload.quantity;
+              total = product.price * product.quantity
+              hasProduct = true;
+            }
+          })
+          cart.products = products
+          
+          if (hasProduct == false) {
+            products.push({
+              "id": productRecord.productId,
+              "name": productRecord.name,
+              "price": productRecord.price,
+              "formmatedPrice": productRecord.formmatedPrice,
+              "quantity": payload.quantity
+            });
+            total = total + (productRecord.price * payload.quantity)
+          }
+          cart.totalFormmated = `R$ ${total}`
+          cart.total = total
+
+          carts.update({'userName': username}, { $set: cart }, {}, (err, doc) => {
+            if(err){
+                callback(err);
+            } else {
+                callback(null, doc);
+            }
+        });
         } else {
-            carts.findByUserName(username, (err, recordCart) => {
-                if (recordUser) {
-                    products = recordCart.products;
-                    let hasProduct = false;
-                    let total = recordCart.total;
-                    products.forEach((product) => {
-                        if (product.productId == payload.id) {
-                            product.quantity = payload.quantity;
-                            total = total + (product.price * product.quantity)
-                            hasProduct = true;
-                        }
-                    })
-
-                    if (!hasProduct) {
-                        products.push({
-                            "id": record.productId,
-                            "name": record.name,
-                            "price": record.price,
-                            "formmatedPrice": record.formmatedPrice,
-                            "quantity": payload.quantity
-                        });
-                        total = total + (record.price * payload.quantity)
-                    }
-
-                    recordCart.total = total
-                } else {
-                    // TODO: Criar uma sacola e adicionar o produto.
-                }
-            })
+          let cart = {
+            userName: username,
+            products: [
+              {
+                id: productRecord.productId,
+                name: productRecord.name,
+                price: productRecord.price,
+                formmatedPrice: productRecord.formmatedPrice,
+                quantity: payload.quantity
+              }
+            ],
+            total: productRecord.price * payload.quantity,
+            totalFormmated: `R$ ${productRecord.price * payload.quantity}`,
+            count: 1
+          }
+          carts.insert(cart, (err, doc) => {
+            if(err){
+                callback(err);
+            } else {
+                callback(null, doc);
+            }
+          });
         }
-    })
+      })
+    }
+  })
 },
 exports.findByUserName = (name, callback) => {
-    carts.findOne({username: name}, (err, carts) => {
+    carts.findOne({userName: name}, (err, carts) => {
       if(err){
         callback(err, null)
       } else {

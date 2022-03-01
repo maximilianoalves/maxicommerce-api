@@ -1,9 +1,9 @@
 let express = require('express');
-let authenticator = require('../helpers/authenticator');
-
 let router  = express.Router();
+
+let authenticator = require('../helpers/authenticator');
 const Cart = require('../models/cart');
-const productsParser = require('../helpers/cartParser');
+const cartParser = require('../helpers/cartParser');
 const validator = require('../helpers/validator');
 const Errors = require('../models/errors');
 
@@ -54,7 +54,21 @@ const Errors = require('../models/errors');
 */
 //GET
 router.get('/', (req, res, next) => {
-    // TODO    
+    authenticator.authCart(req, res, next, (userStatus) => {
+        if (userStatus.userType == 0) {
+            Cart.findByUserName(userStatus.userName, (err, record) => {
+                let cart = cartParser.cart(req, record);
+                if(!record || record.length < 1){
+                  res.status(404).send(Errors.cartNotFoundException());
+                } else {
+                  res.status(200).send(cart);
+                }
+            })
+        } else {
+          res.status(401).send(Errors.userNotFoundException())
+        }
+      });
+    
 });
 
 /**
@@ -114,7 +128,17 @@ router.get('/', (req, res, next) => {
 */
 // POST
 router.post('/add-product/', (req, res, next) => {
-    // TODO    
+    Cart.addProductToCart(req.body, 'admin', (err, record) => {
+        // TODO: Validação da sacola por usuário
+        // TODO: Adicionar o produto para o usuário dinamico.
+        // TODO: Fazer arredondamento
+        let cart = record
+        if(!cart || cart.length < 1){
+          res.status(404).send(Errors.cartNotFoundException());
+        } else {
+          res.status(200).send({ "message": "Produto adicionado com sucesso" });
+        }
+    })
 });
 
 /**
@@ -152,3 +176,6 @@ router.post('/add-product/', (req, res, next) => {
 router.delete('/remove-product/:id', (req, res, next) => {
     // TODO    
 });
+
+
+module.exports = router;
