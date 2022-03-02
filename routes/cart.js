@@ -182,7 +182,19 @@ router.post('/add-product/', (req, res, next) => {
 */
 // DELETE
 router.delete('/remove-product/:id', (req, res, next) => {
-    // TODO    
+  authenticator.authCart(req, res, next, (userStatus) => {
+    if (userStatus.userType == 0) {
+      Cart.delete(req.params.id, userStatus.userName, (err, record) => {
+        if(!record || record.length < 1){
+          res.status(404).send(Errors.productNotExistAtCartException());
+        } else {
+          res.status(200).send({ "message": "Produto removido da sacola com sucesso" });
+        }
+      })
+    } else {
+      res.status(401).send(Errors.userNotFoundException())
+    }
+  })
 });
 
 

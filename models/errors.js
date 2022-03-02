@@ -22,6 +22,10 @@ exports.cartNotFoundException = function() {
   return {error: 'cartNotFoundException', message: 'Nenhuma sacola encontrado'}
 }
 
+exports.productNotExistAtCartException = function() {
+  return {error: 'productNotExistAtCartException', message: 'O produto removido não está na sacola'}
+}
+
 exports.userNameAlreadyExistsException = function() {
   return {error: 'userNameAlReadyExistsException', message: 'userName em uso'};
 }

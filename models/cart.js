@@ -59,7 +59,7 @@ exports.addProductToCart = (payload, username, callback) => {
             } else {
                 callback(null, doc);
             }
-        });
+          });
         } else {
           let cart = {
             userName: username,
@@ -97,19 +97,38 @@ exports.findByUserName = (name, callback) => {
       }
     });
 },
-exports.delete = (id, callback) => {
+exports.delete = (id, username, callback) => {
   this.findByUserName(username, (err, recordCart) => {
     if (recordCart) {
       let cart = recordCart
       let products = recordCart.products
+      let total = 0
+      let change = false
       products.forEach((product, index) => {
-        if (product.id == id) {
+        if (product.id == parseFloat(id)) {
           products.splice(index)
+          change = true
         }
-        // TODO: Totalizar o carrinho
-        // TODO: Validar se não tem somente um produto
-        // TODO: Diminuir o count
+      });
+      cart.products = products
+      cart.products.forEach((product, index) => {
+        total = total + (product.price * product.quantity)
       })
+      cart.total = utils.roundedValues(total)
+      cart.totalFormmated = utils.formmatValues(utils.roundedValues(total))
+      // TODO: Validar se não tem somente um produto
+      cart.count = cart.products.length
+      if(change) {
+        carts.update({'userName': username}, { $set: cart }, {}, (err, doc) => {
+          if(err){
+              callback(err);
+          } else {
+              callback(null, doc);
+          }
+        });
+      } else {
+        callback(err)
+      }
     } else {
       callback(err, null)
     }
