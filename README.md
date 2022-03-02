@@ -4,13 +4,17 @@ Routes
 
 - [x] Ping
     - [x] Get Ping
-- Users
+- [x] Users
     - [x] Get Users
     - [x] Post Users
     - [x] Update Users
     - [x] Delete Users
-- Products
+- [x] Products
     - [x] Get products
-    - [x] Post products - Only with basic auth
-    - [ ] Update products - Only with basic auth
-    - [ ] Delete products - Only with basic auth
+    - [x] Post products 
+    - [x] Update products
+    - [x] Delete products
+- [x] Cart
+    - [x] Get cart
+    - [x] Add product
+    - [x] Remove product
