@@ -4,6 +4,7 @@ let db = new Datastore();
 let Products = require('../models/products')
 let Users = require('../models/users')
 
+let utils = require('../helpers/utils')
 let carts = new Datastore();
 
 
@@ -46,10 +47,11 @@ exports.addProductToCart = (payload, username, callback) => {
               "formmatedPrice": productRecord.formmatedPrice,
               "quantity": payload.quantity
             });
-            total = total + (productRecord.price * payload.quantity)
+            total = utils.roundedValues(total + (productRecord.price * payload.quantity))
           }
           cart.totalFormmated = `R$ ${total}`
           cart.total = total
+          cart.count = cart.count + 1
 
           carts.update({'userName': username}, { $set: cart }, {}, (err, doc) => {
             if(err){
@@ -70,8 +72,8 @@ exports.addProductToCart = (payload, username, callback) => {
                 quantity: payload.quantity
               }
             ],
-            total: productRecord.price * payload.quantity,
-            totalFormmated: `R$ ${productRecord.price * payload.quantity}`,
+            total: utils.roundedValues(productRecord.price * payload.quantity),
+            totalFormmated: `R$ ${utils.roundedValues(productRecord.price * payload.quantity)}`,
             count: 1
           }
           carts.insert(cart, (err, doc) => {

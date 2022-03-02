@@ -15,6 +15,10 @@ exports.validateProduct = function(payload, callback){
   callback(payload, validate(payload, rules.returnProductRuleSet()))
 }
 
+exports.validateAddProduct = function(payload, callback){
+  callback(payload, validate(payload, rules.returnAddProductRuleSet()))
+}
+
 exports.serializeErrosValidateUser = function(msg) {
   let errors = [];
   if (msg.firstname) {
@@ -42,6 +46,17 @@ exports.serializeErrosValidateProduct = function(msg) {
   }
   if (msg.price) {
     errors.push({price: 'Campo price é obrigatório!' });
+  }
+  if (msg.quantity) {
+    errors.push({quantity: 'Campo quantity é obrigatório!' });
+  }
+  return errors;
+}
+
+exports.serializeErrosValidateAddProduct = function(msg) {
+  let errors = [];
+  if (msg.id) {
+    errors.push({id: 'Campo id é obrigatório!' });
   }
   if (msg.quantity) {
     errors.push({quantity: 'Campo quantity é obrigatório!' });

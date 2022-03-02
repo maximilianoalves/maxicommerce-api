@@ -1,4 +1,4 @@
-exports.returnUserRuleSet = function(){
+exports.returnUserRuleSet = () => {
   var constraints = {
     firstname : {presence: true},
     lastname : {presence: true},
@@ -11,7 +11,15 @@ exports.returnUserRuleSet = function(){
   return constraints
 }
 
-exports.returnProductRuleSet = function(){
+exports.returnAddProductRuleSet = () => {
+  var addProductConstraints = {
+    id: {presence: true},
+    quantity: {presence: true}
+  };
+  return addProductConstraints
+}
+
+exports.returnProductRuleSet = () => {
   var productConstraints = {
     name : {presence: true},
     price : {presence: true},

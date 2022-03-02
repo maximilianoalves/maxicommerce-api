@@ -54,21 +54,20 @@ const Errors = require('../models/errors');
 */
 //GET
 router.get('/', (req, res, next) => {
-    authenticator.authCart(req, res, next, (userStatus) => {
-        if (userStatus.userType == 0) {
-            Cart.findByUserName(userStatus.userName, (err, record) => {
-                let cart = cartParser.cart(req, record);
-                if(!record || record.length < 1){
-                  res.status(404).send(Errors.cartNotFoundException());
-                } else {
-                  res.status(200).send(cart);
-                }
-            })
+  authenticator.authCart(req, res, next, (userStatus) => {
+    if (userStatus.userType == 0) {
+      Cart.findByUserName(userStatus.userName, (err, record) => {
+        let cart = cartParser.cart(req, record);
+        if(!record || record.length < 1){
+          res.status(404).send(Errors.cartNotFoundException());
         } else {
-          res.status(401).send(Errors.userNotFoundException())
+          res.status(200).send(cart);
         }
-      });
-    
+      })
+    } else {
+      res.status(401).send(Errors.userNotFoundException())
+    }
+  });
 });
 
 /**
@@ -128,17 +127,26 @@ router.get('/', (req, res, next) => {
 */
 // POST
 router.post('/add-product/', (req, res, next) => {
-    Cart.addProductToCart(req.body, 'admin', (err, record) => {
-        // TODO: Validação da sacola por usuário
-        // TODO: Adicionar o produto para o usuário dinamico.
-        // TODO: Fazer arredondamento
-        let cart = record
-        if(!cart || cart.length < 1){
-          res.status(404).send(Errors.cartNotFoundException());
+  authenticator.authCart(req, res, next, (userStatus) => {
+    if (userStatus.userType == 0) {
+      validator.validateAddProduct(req.body, function (payload, msg) {
+        if(!msg) {
+          Cart.addProductToCart(req.body, userStatus.userName, (err, record) => {
+            if(!record || record.length < 1){
+              res.status(404).send(Errors.cartNotFoundException());
+            } else {
+              res.status(200).send({ "message": "Produto adicionado com sucesso" });
+            }
+          })
         } else {
-          res.status(200).send({ "message": "Produto adicionado com sucesso" });
+          let errors = validator.serializeErrosValidateAddProduct(msg)
+          res.status(400).send(Errors.bodyNotMakeRightException(errors));
         }
-    })
+      })
+    } else {
+      res.status(401).send(Errors.userNotFoundException())
+    }
+  });
 });
 
 /**
