@@ -3,6 +3,7 @@ let db = new Datastore();
 let counter = 0;
 
 let products = new Datastore();
+let utils = require('../helpers/utils')
 
 exports.getAll = (query, callback) => {
     if (Object.keys(query).length > 0) {
@@ -52,7 +53,7 @@ exports.findByName = (name, callback) => {
 exports.create = (payload, callback) => {
     counter++;
     payload.productId = counter;
-    payload.formmatedPrice = `R$ ${payload.price}`
+    payload.formmatedPrice = utils.formmatValues(payload.price)
 
     products.insert(payload, (err, doc) => {
       if(err){
@@ -64,7 +65,7 @@ exports.create = (payload, callback) => {
 },
 exports.update = (id, updateProduct, callback) => {
 
-    updateProduct.formmatedPrice = `R$ ${updateProduct.price}`
+    updateProduct.formmatedPrice = utils.formmatValues(updateProduct.price)
 
     products.update({'productId': parseInt(id)}, { $set: updateProduct }, {}, (err) => {
         if(err){

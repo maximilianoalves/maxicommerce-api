@@ -49,7 +49,7 @@ exports.addProductToCart = (payload, username, callback) => {
             });
             total = utils.roundedValues(total + (productRecord.price * payload.quantity))
           }
-          cart.totalFormmated = `R$ ${total}`
+          cart.totalFormmated = utils.formmatValues(total)
           cart.total = total
           cart.count = cart.count + 1
 
@@ -73,7 +73,7 @@ exports.addProductToCart = (payload, username, callback) => {
               }
             ],
             total: utils.roundedValues(productRecord.price * payload.quantity),
-            totalFormmated: `R$ ${utils.roundedValues(productRecord.price * payload.quantity)}`,
+            totalFormmated: utils.formmatValues(utils.roundedValues(productRecord.price * payload.quantity)),
             count: 1
           }
           carts.insert(cart, (err, doc) => {
@@ -106,9 +106,12 @@ exports.delete = (id, callback) => {
         if (product.id == id) {
           products.splice(index)
         }
+        // TODO: Totalizar o carrinho
+        // TODO: Validar se não tem somente um produto
+        // TODO: Diminuir o count
       })
     } else {
-
+      callback(err, null)
     }
   })
 }

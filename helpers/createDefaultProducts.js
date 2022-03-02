@@ -1,4 +1,4 @@
-let dateFormat = require("dateFormat");
+let utils = require('../helpers/utils');
 
 
 let randomNumber = function(from, to){
@@ -22,7 +22,7 @@ exports.createProduct = () => {
   let product = {
     name: randomProductName(),
     price: randomizedPrice,
-    formmatedPrice: `R$ ${randomizedPrice}`,
+    formmatedPrice: utils.formmatValues(randomizedPrice),
     quantity: randomNumber(0, 25),
   }
 

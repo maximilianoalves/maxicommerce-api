@@ -1,3 +1,5 @@
+let utils = require('../helpers/utils')
+
 exports.allProducts = (req, rawProducts) => {
     let payload = [];
     rawProducts.forEach((product) => {
