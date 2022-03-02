@@ -96,4 +96,19 @@ exports.findByUserName = (name, callback) => {
         callback(null, carts);
       }
     });
+},
+exports.delete = (id, callback) => {
+  this.findByUserName(username, (err, recordCart) => {
+    if (recordCart) {
+      let cart = recordCart
+      let products = recordCart.products
+      products.forEach((product, index) => {
+        if (product.id == id) {
+          products.splice(index)
+        }
+      })
+    } else {
+
+    }
+  })
 }

@@ -150,7 +150,7 @@ router.post('/add-product/', (req, res, next) => {
 });
 
 /**
- * @api {delete} cart/remove-product/ Remove product to cart
+ * @api {delete} cart/remove-product/:id Remove product to cart
  * @apiName RemoveProductToCart
  * @apiGroup Cart
  * @apiVersion 1.0.0
